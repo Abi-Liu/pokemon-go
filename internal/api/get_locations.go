@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"io"
+
+	"github.com/abi-liu/pokedexcli/internal/cache"
 )
 
 type LocationData struct {
@@ -15,15 +17,25 @@ type LocationData struct {
 	} `json:"results"`
 }
 
-func GetLocationData(client *Client, requestUrl *string) (LocationData, error) {
+func GetLocationData(client *Client, cache *cache.Cache, requestUrl *string) (LocationData, error) {
 	url := BASE_URL + "/location-area"
 	if requestUrl != nil {
 		url = *requestUrl
 	}
 
-	res, err := client.HttpClient.Get(url)
-
 	locationData := LocationData{}
+
+	data, ok := cache.Get(url)
+	if ok {
+		err := json.Unmarshal(data, &locationData)
+		if err != nil {
+			return locationData, err
+		}
+
+		return locationData, nil
+	}
+
+	res, err := client.HttpClient.Get(url)
 
 	if err != nil {
 		return locationData, err
@@ -38,6 +50,8 @@ func GetLocationData(client *Client, requestUrl *string) (LocationData, error) {
 	if err != nil {
 		return locationData, err
 	}
+
+	cache.Add(url, body)
 
 	return locationData, nil
 }
