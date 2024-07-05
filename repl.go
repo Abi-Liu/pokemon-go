@@ -17,13 +17,13 @@ func startRepl(config *Config) {
 		text := s.Text()
 		cleanText := cleanInput(text)
 
-		command, ok := commands[cleanText]
+		command, ok := commands[cleanText[0]]
 		if !ok {
 			fmt.Println("Invalid command")
 			continue
 		}
 
-		err := command.callback(config)
+		err := command.callback(config, cleanText)
 		if err != nil {
 			fmt.Println(err)
 			continue
@@ -31,8 +31,8 @@ func startRepl(config *Config) {
 	}
 }
 
-func cleanInput(command string) string {
+func cleanInput(command string) []string {
 	lowercaseText := strings.ToLower(command)
 	slice := strings.Fields(lowercaseText)
-	return strings.Join(slice, " ")
+	return slice
 }
