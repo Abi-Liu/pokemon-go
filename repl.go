@@ -23,7 +23,7 @@ func startRepl(config *Config) {
 			continue
 		}
 
-		err := command.callback(config, cleanText)
+		err := command.callback(config, cleanText[1:])
 		if err != nil {
 			fmt.Println(err)
 			continue
