@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"fmt"
 	"sync"
 	"time"
 )
@@ -49,7 +48,6 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 func (c *Cache) ReapLoop(interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	for range ticker.C {
-		fmt.Println("Tick")
 		c.mu.Lock()
 		for key, val := range c.cache {
 			if val.createdAt.Before(time.Now().Add(-interval)) {

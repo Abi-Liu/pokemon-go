@@ -8,7 +8,7 @@ import (
 )
 
 func ExploreArea(client *Client, cache *cache.Cache, area string) (ExploreRes, error) {
-	url := BASE_URL + "/location/area/" + area
+	url := BASE_URL + "/location-area/" + area
 
 	if data, ok := cache.Get(url); ok {
 		response := ExploreRes{}
