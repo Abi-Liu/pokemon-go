@@ -1,9 +1,8 @@
 package main
 
 import (
-	"time"
-
 	"github.com/abi-liu/pokedexcli/internal/api"
+	"time"
 )
 
 type Config struct {
