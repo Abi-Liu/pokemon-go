@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func startRepl() {
+func startRepl(config *Config) {
 	s := bufio.NewScanner(os.Stdin)
 	fmt.Println("Type a command!\n type 'help' to get started")
 	commands := getCliCommands()
@@ -22,7 +22,12 @@ func startRepl() {
 			fmt.Println("Invalid command")
 			continue
 		}
-		command.callback()
+
+		err := command.callback(config)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
 	}
 }
 

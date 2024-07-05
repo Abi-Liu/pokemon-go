@@ -1,15 +1,17 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"net/http"
 	"os"
+
+	"github.com/abi-liu/pokedexcli/internal/api"
 )
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(config *Config) error
 }
 
 type locationAreaConfig struct {
@@ -32,24 +34,60 @@ func getCliCommands() map[string]cliCommand {
 		},
 		"map": {
 			name:        "map",
-			description: "Displays the names of 20 locations inside the Pokemon world. Each additional call will display the next 20 locations",
+			description: "Displays the names of the next 20 locations inside the Pokemon world.",
 			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays the names of the previous 20 locations inside the Pokemon world",
+			callback:    commandMapb,
 		},
 	}
 }
 
-func commandExit() error {
+func commandExit(config *Config) error {
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp() error {
+func commandHelp(config *Config) error {
 	for k, v := range getCliCommands() {
 		fmt.Printf("%s - %s\n", k, v.description)
 	}
 	return nil
 }
 
-func commandMap() error {
-	res, err := http.Get(BASE_URL + "/location-area/")
+func commandMap(config *Config) error {
+	data, err := api.GetLocationData(config.Client, config.Next)
+	if err != nil {
+		return err
+	}
+	config.Next = data.Next
+	config.Previous = data.Previous
+
+	for i, location := range data.Results {
+		fmt.Printf("%v - %v\n", i+1, location.Name)
+	}
+
+	return nil
+}
+
+func commandMapb(config *Config) error {
+	if config.Previous == nil {
+		return errors.New("You are at the first location area. Cannot go back!")
+	}
+
+	data, err := api.GetLocationData(config.Client, config.Previous)
+	if err != nil {
+		return err
+	}
+
+	config.Next = data.Next
+	config.Previous = data.Previous
+
+	for i, location := range data.Results {
+		fmt.Printf("%v - %v\n", i, location.Name)
+	}
+
+	return nil
 }

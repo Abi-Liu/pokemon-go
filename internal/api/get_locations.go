@@ -15,13 +15,13 @@ type LocationData struct {
 	} `json:"results"`
 }
 
-func getLocationData(client *Client, requestUrl *string) (LocationData, error) {
+func GetLocationData(client *Client, requestUrl *string) (LocationData, error) {
 	url := BASE_URL + "/location-area"
 	if requestUrl != nil {
 		url = *requestUrl
 	}
 
-	res, err := client.httpClient.Get(url)
+	res, err := client.HttpClient.Get(url)
 
 	locationData := LocationData{}
 
