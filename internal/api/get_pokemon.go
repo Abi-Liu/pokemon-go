@@ -27,5 +27,6 @@ func GetPokemonInformation(client *Client, cache *cache.Cache, name string) (Pok
 		return Pokemon{}, err
 	}
 
+	cache.Add(url, body)
 	return pokemon, nil
 }
