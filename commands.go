@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
 
 	"github.com/abi-liu/pokedexcli/internal/api"
@@ -46,6 +47,11 @@ func getCliCommands() map[string]cliCommand {
 			name:        "explore",
 			description: "Explore the pokemon in a certain area. Ex: explore pastoria-city-area",
 			callback:    commandExpolore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Attempt to catch a pokemon. Ex: catch pikachu",
+			callback:    commandCatch,
 		},
 	}
 }
@@ -113,6 +119,31 @@ func commandExpolore(config *Config, opts []string) error {
 	fmt.Println("Found pokemon:")
 	for _, p := range data.PokemonEncounters {
 		fmt.Printf(" - %s\n", p.Pokemon.Name)
+	}
+
+	return nil
+}
+
+func commandCatch(config *Config, opts []string) error {
+	if len(opts) == 0 {
+		return errors.New("Please provide a pokemon name to catch")
+	}
+
+	fmt.Printf("Catching %s...\n", opts[0])
+
+	data, err := api.GetPokemonInformation(config.Client, config.Cache, opts[0])
+	if err != nil {
+		return err
+	}
+
+	catchThreshold := 50
+	probability := rand.Intn(data.BaseExperience)
+
+	if probability <= catchThreshold {
+		config.Pokedex[opts[0]] = data
+		fmt.Printf("You have sucessfully caught %s!\n", opts[0])
+	} else {
+		fmt.Printf("%s has fled!\n", opts[0])
 	}
 
 	return nil
